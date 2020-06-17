@@ -3,7 +3,9 @@ node_modules
 /node_modules
 */node_modules
 */dist
-adminMongo
+/adminMongo
+*/package-lock.json
+package-lock.json
 
 # local env files
 .env.local
