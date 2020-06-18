@@ -15,6 +15,15 @@ const usrSchema = mongoose.Schema({
     //定义Model
 const UsrModel = mongoose.model('usr_infos', usrSchema)
 
+//定义todo表
+const todoSchema = mongoose.Schema({
+    date: { type: String, require: true },
+    timef: { type: String, require: true },
+    timet: { type: String, require: true },
+    item: { type: String, require: true },
+})
+const todoModel = mongoose.model('todo_info', todoSchema)
+
 //insert
 // const usr = {
 //     usr_tel: "1235",
@@ -67,4 +76,4 @@ var update = function(userModel) {
     })
 }
 
-module.exports = { mongoose, UsrModel };
+module.exports = { mongoose, UsrModel, todoModel };

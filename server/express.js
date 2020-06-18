@@ -11,7 +11,7 @@ express.all("*", function(req, res, next) {
     res.header("Access-Control-Max-Age", "86400");
     next();
 });
-var { mongoose, UsrModel } = require('./mongoose')
+var { mongoose, UsrModel, todoModel } = require('./mongoose')
 
 //接受登录信息
 express.post("/verify_usr", function(request, response) {
@@ -58,6 +58,22 @@ express.post("/register_usr", function(req, res) {
             }
         }
     })
+})
+
+//接受增加信息
+express.post('/add_todo', function(req, res) {
+    let data = req.body
+    let newtodoModel = new todoModel(data);
+    newtodoModel.save((err, result) => {
+        if (err) {
+            console.log("添加事项失败")
+        } else {
+            res.send("301").end();
+            console.log("添加事项成功")
+
+        }
+    })
+
 })
 
 express.listen(3000, () => {

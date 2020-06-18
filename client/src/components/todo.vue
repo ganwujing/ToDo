@@ -9,12 +9,20 @@
                         size="large"
                         :defaultValue="moment()"
                         format="YYYY-MM-DD"
+                        v-on:change="changedate"
                     ></a-date-picker>
                     <span class="todo-inputText">ToDo时间</span>
                     <a-time-picker
-                        :default-value="moment()"
+                        placeholder="开始时间"
                         format="HH:mm"
                         size="large"
+                        v-on:change="changeTimeF"
+                    ></a-time-picker>
+                    <a-time-picker
+                    placeholder="结束时间"
+                        format="HH:mm"
+                        size="large"
+                        v-on:change="changeTimeT"
                     ></a-time-picker>
                 </div>
                 <div class="todo-input todo-inputitem">
@@ -25,7 +33,7 @@
                         enter-button="添加ToDo"
                         size="large"
                         @search="addToDO"
-                        
+                        v-model="todoitem"
                     >
                     </a-input-search>
                     </div>
@@ -33,7 +41,7 @@
             </div>
             <div class="progress top-child">
                 <h1 class="todo-title">
-                    今日完成进度
+                    ToDo完成进度
                 </h1>
                 <div style="width: 50%" class="todo-progress">
                     <span>事项一</span>
@@ -85,7 +93,7 @@
                 </div>
             </div>
             <div class="todoline">
-                <h1 class="todo-title">今日待办时间轴</h1>
+                <h1 class="todo-title">ToDo时间轴</h1>
                 <div class="todo-line">
                 <a-timeline >
                     <a-timeline-item color="green">
@@ -177,17 +185,52 @@ const data = [
 import moment from "moment"
 export default {
     name: "todo",
-
-    methods: {
-        moment,
-        addToDO: function() {},
-    },
     data: function() {
         return {
             data,
             columns,
+            selectdate:moment().format('YYYY-MM-DD'),
+            todoitem:'',
+            selecttimeF:moment().format('HH:mm'),
+            selecttimeT:moment().format('HH:mm'),
         };
     },
+    methods: {
+        moment,
+        changedate:function(date){
+         this.selectdate= moment(date).format('YYYY-MM-DD')
+        },
+        changeTimeF:function(data){
+            this.selecttimeF=moment(data).format('HH:mm')
+        },
+        changeTimeT:function(data){
+            this.selecttimeT=moment(data).format('HH:mm')
+        },
+        addToDO: function() {
+            var data={}
+            data.date=this.selectdate;
+            data.timef=this.selecttimeF;
+            data.timet=this.selecttimeT;
+            data.item=this.todoitem;
+            this.axios({
+                method:'post',
+                url:this.api+'/add_todo',
+                data:data,
+            }).then((res)=>{
+                if(res.data=="301"){
+                    alert("success")
+                    this.todoitem="";
+                }
+                console.log(res.data)
+            }).catch((err)=>{
+                console.log(err)
+            })
+
+        },
+       
+    },
+  
+   
 };
 </script>
 <style>
@@ -231,11 +274,11 @@ background-color: #fafafa;
     /* width: 70%; */
     position: relative;
     top: -30px;
-    right: -20%;
+    right: -18%;
 }
 
 .todo-inputText {
-    margin: 5%;
+    margin: 4%;
 }
 
 .ant-progress-bg {
