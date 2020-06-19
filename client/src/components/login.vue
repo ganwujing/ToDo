@@ -15,17 +15,20 @@
             </div>
         </div>
         <register :showregister="isshowregister" v-on:closeshowpage="closeRegisterPage"></register>
+        <todo :usr_tel="telinput"></todo>
     </div>
 </template>
 <script>
 import register from './register'
+import todo from './todo'
 export default {
     name:'tellogin',
     props:{
         isshow:Boolean,
     },
     components:{
-        register
+        register,
+        todo,
     },
     data:function(){
         return{

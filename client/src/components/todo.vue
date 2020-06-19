@@ -142,9 +142,11 @@ const columns = [
 
 //const data = showTodo
 import moment from "moment"
-import login from './login'
 export default {
     name: "todo",
+    props:{
+        usr_tel:String
+    },
     data: function() {
         return {
             tododata:[],
@@ -202,6 +204,7 @@ export default {
                     this.todoitem="";
                 }
                 console.log(res.data)
+                console.log(this.usr_tel)
             }).catch((err)=>{
                 console.log(err)
             })
