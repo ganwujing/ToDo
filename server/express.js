@@ -13,7 +13,9 @@ express.all("*", function(req, res, next) {
 });
 var { mongoose, UsrModel, todoModel } = require('./mongoose')
 
-//接受登录信息
+/**
+ * 用户登录
+ */
 express.post("/verify_usr", function(request, response) {
     const usrinfo = request.body;
     console.log("从前台接受的数据为：" + usrinfo)
@@ -37,7 +39,9 @@ express.post("/verify_usr", function(request, response) {
     })
 })
 
-//接收注册信息
+/**
+ * 用户注册
+ */
 express.post("/register_usr", function(req, res) {
     const data = req.body;
     //查找手机号是否已经注册过
@@ -60,7 +64,9 @@ express.post("/register_usr", function(req, res) {
     })
 })
 
-//接受增加信息
+/**
+ * 添加todo
+ */
 express.post('/add_todo', function(req, res) {
     let data = req.body
     let newtodoModel = new todoModel(data);
@@ -70,10 +76,24 @@ express.post('/add_todo', function(req, res) {
         } else {
             res.send("301").end();
             console.log("添加事项成功")
-
         }
     })
+})
 
+/**
+ * 查询todo
+ */
+express.get('/get_todo', function(req, res) {
+    let date = req.query.date
+    console.log("后台接受的数据为" + date)
+    todoModel.find({ date: date }, (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(result);
+            res.send(result).end();
+        }
+    })
 })
 
 express.listen(3000, () => {

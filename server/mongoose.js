@@ -21,6 +21,7 @@ const todoSchema = mongoose.Schema({
     timef: { type: String, require: true },
     timet: { type: String, require: true },
     item: { type: String, require: true },
+    status: { type: String, require: true },
 })
 const todoModel = mongoose.model('todo_info', todoSchema)
 

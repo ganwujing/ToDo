@@ -32,7 +32,9 @@
                         placeholder="input todo item"
                         enter-button="添加ToDo"
                         size="large"
+                        style="width:80%"
                         @search="addToDO"
+                       
                         v-model="todoitem"
                     >
                     </a-input-search>
@@ -43,15 +45,12 @@
                 <h1 class="todo-title">
                     ToDo完成进度
                 </h1>
-                <div style="width: 50%" class="todo-progress">
-                    <span>事项一</span>
-                    <a-progress :percent="30" size="small" />
-                    <span>事项二</span>
-                    <a-progress :percent="50" size="small" />
-                    <span>todo前端静态页面</span>
-                    <a-progress :percent="100" size="small" />
+                <div style="width: 50%" class="todo-progress" v-for="item in tododata" :key="item._id" >
+                    <span >{{item.item}}</span>
+                    <a-progress  :percent="100" size="small" />
+                   
                 </div>
-                <div class="todo-progress">
+                <div class="todo-progress-circle">
                     <a-progress type="circle" :percent="75" />
                 </div>
             </div>
@@ -60,7 +59,7 @@
             <div class="todotable">
             <h1 class="todo-title">ToDo待办事项</h1>
             <div class="todo-table">
-                <a-table :columns="columns" :data-source="data">
+                <a-table :columns="columns" :data-source="tododata">
                     <a slot="name" slot-scope="text">{{ text }}</a>
                     <span slot="customTitle"
                         ><a-icon type="smile-o" /> Name</span
@@ -96,31 +95,13 @@
                 <h1 class="todo-title">ToDo时间轴</h1>
                 <div class="todo-line">
                 <a-timeline >
-                    <a-timeline-item color="green">
-                        Create a services site 2015-09-01
-                    </a-timeline-item>
-                    <a-timeline-item color="green">
-                        Create a services site 2015-09-01
-                    </a-timeline-item>
-                    <a-timeline-item color="red">
-                        <p>Solve initial network problems 1</p>
-                        <p>Solve initial network problems 2</p>
-                        <p>Solve initial network problems 3 2015-09-01</p>
-                    </a-timeline-item>
-                    <a-timeline-item>
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
-                    </a-timeline-item>
-                    <a-timeline-item color="gray">
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
-                    </a-timeline-item>
-                    <a-timeline-item color="gray">
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
+                    <a-timeline-item 
+                    v-for="item in tododata" :key="item._id"
+                    color="red" 
+                    style="padding-bottom:40px"
+                    >
+                       {{item.timef}}~{{item.timet}}
+                       <span>{{item.item}}</span>
                     </a-timeline-item>
                 </a-timeline>
                 </div>
@@ -159,41 +140,39 @@ const columns = [
     },
 ];
 
-const data = [
-    {
-        key: "1",
-        name: "John Brown",
-        age: 32,
-        address: "New York No. 1 Lake Park",
-        tags: ["nice", "developer"],
-    },
-    {
-        key: "2",
-        name: "Jim Green",
-        age: 42,
-        address: "London No. 1 Lake Park",
-        tags: ["loser"],
-    },
-    {
-        key: "3",
-        name: "Joe Black",
-        age: 32,
-        address: "Sidney No. 1 Lake Park",
-        tags: ["cool", "teacher"],
-    },
-];
+//const data = showTodo
 import moment from "moment"
+import login from './login'
 export default {
     name: "todo",
     data: function() {
         return {
-            data,
+            tododata:[],
             columns,
             selectdate:moment().format('YYYY-MM-DD'),
             todoitem:'',
             selecttimeF:moment().format('HH:mm'),
             selecttimeT:moment().format('HH:mm'),
+            
         };
+    },
+    created:function(){
+            let currdate="2020-06-18"
+            this.axios({
+                method:'get',
+                url:this.api+'/get_todo',
+                params:{
+                    date:currdate,
+                }
+            }).then((res)=>{
+                this.tododata=res.data;
+                console.log(this.tododata)
+            }).catch((err)=>{
+                console.log(err)
+            })
+    },
+    computed:{
+ 
     },
     methods: {
         moment,
@@ -212,6 +191,7 @@ export default {
             data.timef=this.selecttimeF;
             data.timet=this.selecttimeT;
             data.item=this.todoitem;
+            data.status="undo"
             this.axios({
                 method:'post',
                 url:this.api+'/add_todo',
@@ -225,11 +205,8 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
-
-        },
-       
+        },       
     },
-  
    
 };
 </script>
@@ -270,6 +247,7 @@ background-color: #fafafa;
     border-radius: 5px;
     box-shadow: 2px 4px 8px 5px rgba(216, 164, 67, 0.5);
 }
+
 .todoinput {
     /* width: 70%; */
     position: relative;
@@ -290,6 +268,15 @@ background-color: #fafafa;
 .todo-input,.todo-progress ,.todo-table,.todo-line{
     margin:20px 0px;
     margin-left: 5%;
+}
+.todo-progress{
+    margin:5px 0px;
+    margin-left: 5%;
+}
+.todo-progress-circle{
+    position: absolute;
+    right: 5%;
+    top: 100px;
 }
 @font-face {
     font-family: microsoft;
