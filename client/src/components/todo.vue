@@ -34,30 +34,13 @@
                         size="large"
                         style="width:80%"
                         @search="addToDO"
-                       
                         v-model="todoitem"
                     >
                     </a-input-search>
                     </div>
                 </div>
-            </div>
-            <div class="progress top-child">
-                <h1 class="todo-title">
-                    ToDo完成进度
-                </h1>
-                <div style="width: 50%" class="todo-progress" v-for="item in tododata" :key="item._id" >
-                    <span >{{item.item}}</span>
-                    <a-progress  :percent="100" size="small" />
-                   
-                </div>
-                <div class="todo-progress-circle">
-                    <a-progress type="circle" :percent="75" />
-                </div>
-            </div>
-        </div>
-        <div class="top">
-            <div class="todotable">
-            <h1 class="todo-title">ToDo待办事项</h1>
+
+                 <h1 class="todo-title">ToDo待办事项</h1>
             <div class="todo-table">
                 <a-table :columns="columns" :data-source="tododata">
                     <a slot="name" slot-scope="text">{{ text }}</a>
@@ -91,13 +74,25 @@
                 </a-table>
                 </div>
             </div>
-            <div class="todoline">
-                <h1 class="todo-title">ToDo时间轴</h1>
+            <div class="progress top-child">
+                <h1 class="todo-title">
+                    ToDo完成进度
+                </h1>
+                <div style="width: 50%" class="todo-progress" v-for="item in tododata" :key="item._id" >
+                    <span >{{item.item}}</span>
+                    <a-progress  :percent="item.status=='undo'?'0':'100'" size="small" />
+                   
+                </div>
+                <div class="todo-progress-circle">
+                    <a-progress type="circle" :percent="75" />
+                </div>
+
+                 <h1 class="todo-title">ToDo时间轴</h1>
                 <div class="todo-line">
                 <a-timeline >
                     <a-timeline-item 
                     v-for="item in tododata" :key="item._id"
-                    color="red" 
+                    :color="item.status=='undo'?'blue':'red'" 
                     style="padding-bottom:40px"
                     >
                        {{item.timef}}~{{item.timet}}
@@ -107,9 +102,13 @@
                 </div>
             </div>
         </div>
+        
     </div>
 </template>
 <script>
+const config ={
+   tododate:moment().format('YYYY-MM-DD'),
+}
 const columns = [
     {
         dataIndex: "name",
@@ -159,7 +158,14 @@ export default {
         };
     },
     created:function(){
-            let currdate="2020-06-18"
+            this.getdata();
+    },
+    computed:{
+ 
+    },
+    methods: {
+        getdata:function(){
+            let currdate=config.tododate
             this.axios({
                 method:'get',
                 url:this.api+'/get_todo',
@@ -172,11 +178,7 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
-    },
-    computed:{
- 
-    },
-    methods: {
+        },
         moment,
         changedate:function(date){
          this.selectdate= moment(date).format('YYYY-MM-DD')
@@ -205,6 +207,7 @@ export default {
                 }
                 console.log(res.data)
                 console.log(this.usr_tel)
+                this.getdata();
             }).catch((err)=>{
                 console.log(err)
             })
@@ -239,7 +242,7 @@ export default {
 }
 .progress,
 .todoline {
-    flex-basis: 45%;
+    flex-basis: 48%;
 }
 .fillinfo,
 .todotable,
@@ -265,20 +268,18 @@ background-color: #fafafa;
 .ant-progress-bg {
     float: left;
 }
-.todo-progress {
-    float: left;
-}
+
 .todo-input,.todo-progress ,.todo-table,.todo-line{
     margin:20px 0px;
     margin-left: 5%;
 }
 .todo-progress{
-    margin:5px 0px;
+    margin:10px 0px;
     margin-left: 5%;
 }
 .todo-progress-circle{
     position: absolute;
-    right: 5%;
+    right: 8%;
     top: 100px;
 }
 @font-face {
