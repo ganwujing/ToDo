@@ -75,7 +75,7 @@ express.post('/add_todo', function(req, res) {
             console.log("添加事项失败")
         } else {
             res.send("301").end();
-            console.log("添加事项成功")
+            console.log("添加事项成功" + result)
         }
     })
 })
@@ -85,8 +85,9 @@ express.post('/add_todo', function(req, res) {
  */
 express.get('/get_todo', function(req, res) {
     let date = req.query.date
-    console.log("后台接受的数据为" + date)
-    todoModel.find({ date: date }, (err, result) => {
+    let tel = req.query.usr_tel
+    console.log("后台接受的数据为" + date + tel)
+    todoModel.find({ date: date, usr_tel: tel }, (err, result) => {
         if (err) {
             console.log(err)
         } else {

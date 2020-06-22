@@ -16,6 +16,9 @@ import {
     Icon,
     Tag,
     Divider,
+    Alert,
+    Checkbox,
+    Switch,
 } from 'ant-design-vue'
 Vue.component(TimePicker.name, TimePicker)
 Vue.component(Button.name, Button)
@@ -27,6 +30,9 @@ Vue.component(Table.name, Table)
 Vue.component(Icon.name, Icon)
 Vue.component(Tag.name, Tag)
 Vue.component(Divider.name, Divider)
+Vue.component(Alert.name, Alert)
+Vue.component(Checkbox.name, Checkbox)
+Vue.component(Switch.name, Switch)
 
 Vue.use(Timeline)
 Vue.use(Input)

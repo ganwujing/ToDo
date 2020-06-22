@@ -15,12 +15,10 @@
             </div>
         </div>
         <register :showregister="isshowregister" v-on:closeshowpage="closeRegisterPage"></register>
-        <todo :usr_tel="telinput"></todo>
     </div>
 </template>
 <script>
 import register from './register'
-import todo from './todo'
 export default {
     name:'tellogin',
     props:{
@@ -28,7 +26,6 @@ export default {
     },
     components:{
         register,
-        todo,
     },
     data:function(){
         return{
@@ -66,7 +63,14 @@ export default {
                 }
                 if(res.data=="101"){
                     this.msg="登录成功"
-                    this.$router.push("/todo");
+                    this.$router.push(
+                        {
+                            name:'todo',
+                            params:{
+                                tel:this.telinput
+                            }
+                        }
+                    );
                 }
             }).catch((err)=>{
                 console.log("axios传输失败:"+err)
