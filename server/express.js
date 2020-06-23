@@ -81,6 +81,21 @@ express.post('/add_todo', function(req, res) {
 })
 
 /**
+ * 修改todo
+ */
+express.post('/modify_todo', function(req, res) {
+    let data = req.body
+    todoModel.findOneAndUpdate({_id:data._id},{status:data.status},(err, result) => {
+        if (err) {
+            console.log("修改事项失败")
+        } else {
+            res.send("401").end();
+            console.log("修改事项成功" + result)
+        }
+    })
+})
+
+/**
  * 查询todo
  */
 express.get('/get_todo', function(req, res) {
