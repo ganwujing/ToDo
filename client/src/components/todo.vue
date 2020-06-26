@@ -117,19 +117,36 @@ export default {
   },
   computed: {
     todopercent: function() {
-      let percent = 0;
+
+        return Math.round(
+            this.doStatusCount
+            /this.tododata.length
+            *100
+            )
+      /*let percent = 0;
       if (this.tododata.length != 0) {
-        let count = 1;
+        let count = 0;
         let newpercent =(1 / this.tododata.length) * 100
        
-          this.tododata.forEach(item => {
-            if (item.status == "do") {
-              count = count + 1;
+          this.tododata.forEach(
+              item => {
+                if (item.status == "do") {
+                count = count + 1;
+                }
             }
-          });
+          );
+
+
+
         percent =Math.round (newpercent * count);
       }
-      return percent;
+      return percent;*/
+    },
+    doStatusCount:function(){
+        return this.tododata.filter(item=>item.status=='do').length
+    },
+    undoStatusCount:function(){
+        return this.tododata.filter(item=>item.status=='undo').length
     }
   },
   methods: {

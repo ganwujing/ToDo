@@ -109,7 +109,7 @@ express.get('/get_todo', function(req, res) {
             console.log(result);
             res.send(result).end();
         }
-    })
+    }).sort({"timef":1})
 })
 
 express.listen(3000, () => {
