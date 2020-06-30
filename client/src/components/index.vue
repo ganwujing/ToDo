@@ -1,6 +1,6 @@
 <template>
 <div >
-    <div id="index">
+    <div id="index" >
           <header class="index-header">
         <div class="header-logo">
             <img src="../assets/logo.svg">
@@ -51,7 +51,7 @@
         </footer>
     </div>
     </div>
-    <login :isshow='showtellogin'  v-on:changeshowpage="isshowpage"></login>
+    <login :isshow='showtellogin'  :cookie='cookieVal'  v-on:changeshowpage="isshowpage"></login>
     
     </div>
 </template>
@@ -65,6 +65,13 @@ export default {
     data:function(){
         return{
             showtellogin:false,
+            cookieVal:"",
+        }
+    },
+    created:function(){
+        this.cookieVal=document.cookieVal;
+        if(this.cookieVal!=""){
+            console.log(this.cookieVal)
         }
     },
 
@@ -77,6 +84,9 @@ export default {
         },
         closeShowPage:function(param){
             this.showtellogin=param
+        },
+        loadSite:function(){
+            console.log(document.cookie)
         }
     },    
 }

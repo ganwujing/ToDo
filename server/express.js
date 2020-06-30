@@ -1,6 +1,10 @@
 var express = require("express")()
     //使用中间件获取post请求的body中的数据
 var bodyParser = require("body-parser")
+var cookie=require("cookie-parser")
+var session=require("express-session")
+express.use(session)
+express.use(cookie)
 express.use(bodyParser.urlencoded({ extended: false }))
 express.use(bodyParser.json())
 
@@ -31,6 +35,11 @@ express.post("/verify_usr", function(request, response) {
                     //判断密码是否相同
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
                     response.send("101").end();
+
+                    //登录成功，若cookie值为空，产生cookie发送给客户端
+                    if(usrinfo.cookie==""){
+                        cookie.use()
+                    }
                 } else {
                     response.send("102").end();
                 }

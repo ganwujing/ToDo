@@ -23,6 +23,7 @@ export default {
     name:'tellogin',
     props:{
         isshow:Boolean,
+        cookie:String,
     },
     components:{
         register,
@@ -47,6 +48,7 @@ export default {
             var data={}
             data.usr_tel=this.telinput
             data.usr_pwd=this.pwdinput
+            data.cookie=this.cookie
             //查找用户是否存在，以及密码是否正确
             this.axios({
                 method:'POST',
