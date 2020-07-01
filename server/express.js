@@ -1,11 +1,21 @@
 var express = require("express")()
     //使用中间件获取post请求的body中的数据
 var bodyParser = require("body-parser")
-var cookie=require("cookie-parser")
-var session=require("express-session")
-express.use(session)
-express.use(cookie)
-express.use(bodyParser.urlencoded({ extended: false }))
+var cookie = require("cookie-parser")
+var session = require("express-session")
+express.use(cookie("signstr"))
+express.use(session({
+    secret: "signstr",
+    name: "loginCookie",
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+        'maxAge': 2160000
+    },
+}))
+express.use(bodyParser.urlencoded({
+    extended: false
+}))
 express.use(bodyParser.json())
 
 express.all("*", function(req, res, next) {
@@ -16,6 +26,19 @@ express.all("*", function(req, res, next) {
     next();
 });
 var { mongoose, UsrModel, todoModel } = require('./mongoose')
+
+
+/**
+ * 判断session对应的用户ID
+ */
+express.get('/verify_cookie', function(req, res) {
+    let cookieval = req.query.cookie;
+    let seesionData = req.session
+    let usr_tel = seesionData.usrinfo.usr_tel
+    if (!usr_tel) {
+        res.send(usr_tel)
+    }
+})
 
 /**
  * 用户登录
@@ -36,10 +59,11 @@ express.post("/verify_usr", function(request, response) {
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
                     response.send("101").end();
 
-                    //登录成功，若cookie值为空，产生cookie发送给客户端
-                    if(usrinfo.cookie==""){
-                        cookie.use()
+                    //登录成功，若cookie值为空，产生session,发送cookie给客户端
+                    if (request.cookies.loginCookie == "") {
+                        request.session.usrinfo = usrinfo;
                     }
+
                 } else {
                     response.send("102").end();
                 }
@@ -94,7 +118,7 @@ express.post('/add_todo', function(req, res) {
  */
 express.post('/modify_todo', function(req, res) {
     let data = req.body
-    todoModel.findOneAndUpdate({_id:data._id},{status:data.status},(err, result) => {
+    todoModel.findOneAndUpdate({ _id: data._id }, { status: data.status }, (err, result) => {
         if (err) {
             console.log("修改事项失败")
         } else {
@@ -118,7 +142,7 @@ express.get('/get_todo', function(req, res) {
             console.log(result);
             res.send(result).end();
         }
-    }).sort({"timef":1})
+    }).sort({ "timef": 1 })
 })
 
 express.listen(3000, () => {
