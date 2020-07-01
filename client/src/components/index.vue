@@ -70,8 +70,21 @@ export default {
     },
     created:function(){
         this.cookieVal=document.cookieVal;
+        //cookie值不为空，去查找对应的用户并自动登录
         if(this.cookieVal!=""){
             console.log(this.cookieVal)
+            this.axios({
+                method:'get',
+                url:this.api+"/verify_cookie",
+                params:{
+                    cookie:this.cookieVal,
+                }
+
+            }).then((result)=>{
+                console.log(result)
+            }).catch((err)=>{
+                console.log(err)
+            })
         }
     },
 
