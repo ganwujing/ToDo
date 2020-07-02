@@ -69,9 +69,9 @@ export default {
         }
     },
     created:function(){
-        this.cookieVal=document.cookieVal;
+        this.cookieVal=document.cookie;
         //cookie值不为空，去查找对应的用户并自动登录
-        if(this.cookieVal!=""){
+        if(this.cookieVal==""){
             console.log(this.cookieVal)
             this.axios({
                 method:'get',

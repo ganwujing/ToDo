@@ -26,6 +26,7 @@ express.all("*", function(req, res, next) {
     next();
 });
 var { mongoose, UsrModel, todoModel } = require('./mongoose')
+const { json } = require("express")
 
 
 /**
@@ -33,8 +34,11 @@ var { mongoose, UsrModel, todoModel } = require('./mongoose')
  */
 express.get('/verify_cookie', function(req, res) {
     let cookieval = req.query.cookie;
+    console.log("cookie值为"+cookieval)
     let seesionData = req.session
-    let usr_tel = seesionData.usrinfo.usr_tel
+    console.log("session数据为"+ JSON.stringify(seesionData.usrinfo) )
+
+    let usr_tel = seesionData.usrinfo
     if (!usr_tel) {
         res.send(usr_tel)
     }
@@ -58,10 +62,11 @@ express.post("/verify_usr", function(request, response) {
                     //判断密码是否相同
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
                     response.send("101").end();
-
+                    
                     //登录成功，若cookie值为空，产生session,发送cookie给客户端
-                    if (request.cookies.loginCookie == "") {
+                    if (usrinfo.cookie == "") {
                         request.session.usrinfo = usrinfo;
+                        console.log("存储在服务器内存中的session信息为"+JSON.stringify(request.session))
                     }
 
                 } else {

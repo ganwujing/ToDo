@@ -65,6 +65,7 @@ export default {
                 }
                 if(res.data=="101"){
                     this.msg="登录成功"
+                    console.log(document.cookie)
                     this.$router.push(
                         {
                             name:'todo',
