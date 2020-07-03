@@ -1,47 +1,42 @@
 var express = require("express")()
     //使用中间件获取post请求的body中的数据
 var bodyParser = require("body-parser")
+var uuid = require("node-uuid")
 var cookie = require("cookie-parser")
 var session = require("express-session")
-express.use(cookie("signstr"))
-express.use(session({
-    secret: "signstr",
-    name: "loginCookie",
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-        'maxAge': 2160000
-    },
-}))
 express.use(bodyParser.urlencoded({
     extended: false
 }))
 express.use(bodyParser.json())
 
 express.all("*", function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
     res.header("Access-Control-Allow-Headers", "X-Requested-With,Content-Type");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Credentials", true); //服务端可以发送cookie到客户端
     res.header("Access-Control-Max-Age", "86400");
     next();
 });
 var { mongoose, UsrModel, todoModel } = require('./mongoose')
-const { json } = require("express")
-
+const { json, response } = require("express")
+var cookiesessionArray = []
+var cookiesessionitem = {}
 
 /**
  * 判断session对应的用户ID
  */
 express.get('/verify_cookie', function(req, res) {
-    let cookieval = req.query.cookie;
-    console.log("cookie值为"+cookieval)
-    let seesionData = req.session
-    console.log("session数据为"+ JSON.stringify(seesionData.usrinfo) )
-
-    let usr_tel = seesionData.usrinfo
-    if (!usr_tel) {
-        res.send(usr_tel)
+    let cookieval = req.query.cookie.split('=');
+    console.log("cookie值为" + cookieval[1])
+    let filterArray = cookiesessionArray.filter(item => item.sessionID == cookieval[1])
+    if (filterArray.length == 1) {
+        var usr_tel = filterArray[0].usrinfo.usr_tel;
+        console.log(usr_tel)
+        res.send("501")
+    } else {
+        res.send("502")
     }
+
 })
 
 /**
@@ -61,13 +56,20 @@ express.post("/verify_usr", function(request, response) {
                 console.log("查询到手机号为：" + result)
                     //判断密码是否相同
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
-                    response.send("101").end();
-                    
+
                     //登录成功，若cookie值为空，产生session,发送cookie给客户端
                     if (usrinfo.cookie == "") {
-                        request.session.usrinfo = usrinfo;
-                        console.log("存储在服务器内存中的session信息为"+JSON.stringify(request.session))
+                        sessionID = uuid();
+                        cookiesessionitem.sessionID = uuid();
+                        cookiesessionitem.usrinfo = usrinfo;
+                        cookiesessionArray.push(cookiesessionitem)
+                        cookieVal = cookiesessionitem.sessionID
+                        console.log("在内存中的" + JSON.stringify(cookiesessionArray))
+                        response.header("Set-Cookie", "logincookie=" + cookieVal + ";Max-Age:360000")
+
+
                     }
+                    response.send("101").end();
 
                 } else {
                     response.send("102").end();

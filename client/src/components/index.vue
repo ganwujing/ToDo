@@ -11,9 +11,9 @@
                 <li><a href="#product-introduce">产品介绍</a></li>
                 <li><a href="#contact-us">联系我们</a></li>
             </ul>
-            <router-link :to="{name:'todo'}">
-            <button class="btn nav-btn" >进入ToDo</button>
-            </router-link>
+            <button class="btn nav-btn" 
+            @click="enterTodo"
+            >进入ToDo</button>
         </nav>
         <div class="header-login" @click="loginByTel">
             <span>登录/注册</span>
@@ -68,27 +68,37 @@ export default {
             cookieVal:"",
         }
     },
-    created:function(){
+
+    methods:{
+        enterTodo:function(){
         this.cookieVal=document.cookie;
-        //cookie值不为空，去查找对应的用户并自动登录
         if(this.cookieVal==""){
+            this.loginByTel();
+        }
+        //cookie值不为空，去查找对应的用户并自动登录
+        if(this.cookieVal!=""){
             console.log(this.cookieVal)
             this.axios({
                 method:'get',
                 url:this.api+"/verify_cookie",
                 params:{
                     cookie:this.cookieVal,
-                }
+                },
+                withCredentials:true
 
             }).then((result)=>{
-                console.log(result)
+                if(result.data=="501"){
+                    //cookie验证成功，转到todo页面
+                    console.log(result)
+                }
+                if(result.data=="502"){
+                    this.loginByTel();
+                }
             }).catch((err)=>{
                 console.log(err)
             })
         }
     },
-
-    methods:{
         loginByTel:function(){
             this.showtellogin=true
         },
@@ -98,9 +108,7 @@ export default {
         closeShowPage:function(param){
             this.showtellogin=param
         },
-        loadSite:function(){
-            console.log(document.cookie)
-        }
+   
     },    
 }
 </script>
