@@ -3,16 +3,9 @@ var express = require("express")()
 var bodyParser = require("body-parser")
 var cookie = require("cookie-parser")
 var session = require("express-session")
-express.use(cookie("signstr"))
-express.use(session({
-    secret: "signstr",
-    name: "loginCookie",
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-        'maxAge': 2160000
-    },
-}))
+var uuid=require("node-uuid")
+// express.use(cookie("signstr"))
+
 express.use(bodyParser.urlencoded({
     extended: false
 }))
@@ -61,13 +54,18 @@ express.post("/verify_usr", function(request, response) {
                 console.log("查询到手机号为：" + result)
                     //判断密码是否相同
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
-                    response.send("101").end();
+                    
                     
                     //登录成功，若cookie值为空，产生session,发送cookie给客户端
-                    if (usrinfo.cookie == "") {
-                        request.session.usrinfo = usrinfo;
+                    // if (request.cookie == "") {
+                        let sessioncookie={};
+                        sessioncookie.sessionID=uuid();
+                        sessioncookie.cookieVal=uuid();
+                        response.header("Set-Cookie","UID=PIG")
+    
                         console.log("存储在服务器内存中的session信息为"+JSON.stringify(request.session))
-                    }
+                        response.send("101").end();
+                    // }
 
                 } else {
                     response.send("102").end();
@@ -150,6 +148,6 @@ express.get('/get_todo', function(req, res) {
     }).sort({ "timef": 1 })
 })
 
-express.listen(3000, () => {
+express.listen(8080, () => {
     console.log("ToDo后台管理已上线")
 })
