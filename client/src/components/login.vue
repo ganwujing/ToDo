@@ -53,7 +53,8 @@ export default {
             this.axios({
                 method:'POST',
                 url:this.api+"/verify_usr",
-                data:data
+                data:data,
+                withCredentials:true,
             }).
             then((res)=>{
                 if(res.data=="103"){
