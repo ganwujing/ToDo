@@ -4,19 +4,13 @@ var bodyParser = require("body-parser")
 var uuid = require("node-uuid")
 var cookie = require("cookie-parser")
 var session = require("express-session")
-<<<<<<< HEAD
-var uuid=require("node-uuid")
-// express.use(cookie("signstr"))
-
-=======
->>>>>>> dd1f780739112c0a2cd11a18fb109b137eb16240
 express.use(bodyParser.urlencoded({
     extended: false
 }))
 express.use(bodyParser.json())
 
 express.all("*", function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+    res.header("Access-Control-Allow-Origin", "http://localhost:8081");
     res.header("Access-Control-Allow-Headers", "X-Requested-With,Content-Type");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     res.header("Access-Control-Allow-Credentials", true); //服务端可以发送cookie到客户端
@@ -32,18 +26,22 @@ var cookiesessionitem = {}
  * 判断session对应的用户ID
  */
 express.get('/verify_cookie', function(req, res) {
-    let cookieval = req.query.cookie.split('=');
+    var usr_tel=searchIDBycookie(req.query.cookie)
+    usr_tel!=""?res.send("501"):res.send("502")
+    
+})
+
+/**判断cookie对应的用户ID */
+function searchIDBycookie(cookieVal){
+    let cookieval = cookieVal.split('=');
     console.log("cookie值为" + cookieval[1])
     let filterArray = cookiesessionArray.filter(item => item.sessionID == cookieval[1])
     if (filterArray.length == 1) {
         var usr_tel = filterArray[0].usrinfo.usr_tel;
         console.log(usr_tel)
-        res.send("501")
-    } else {
-        res.send("502")
     }
-
-})
+    return usr_tel;
+}
 
 /**
  * 用户登录
@@ -62,20 +60,6 @@ express.post("/verify_usr", function(request, response) {
                 console.log("查询到手机号为：" + result)
                     //判断密码是否相同
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
-<<<<<<< HEAD
-                    
-                    
-                    //登录成功，若cookie值为空，产生session,发送cookie给客户端
-                    // if (request.cookie == "") {
-                        let sessioncookie={};
-                        sessioncookie.sessionID=uuid();
-                        sessioncookie.cookieVal=uuid();
-                        response.header("Set-Cookie","UID=PIG")
-    
-                        console.log("存储在服务器内存中的session信息为"+JSON.stringify(request.session))
-                        response.send("101").end();
-                    // }
-=======
 
                     //登录成功，若cookie值为空，产生session,发送cookie给客户端
                     if (usrinfo.cookie == "") {
@@ -90,7 +74,6 @@ express.post("/verify_usr", function(request, response) {
 
                     }
                     response.send("101").end();
->>>>>>> dd1f780739112c0a2cd11a18fb109b137eb16240
 
                 } else {
                     response.send("102").end();
@@ -161,8 +144,9 @@ express.post('/modify_todo', function(req, res) {
  */
 express.get('/get_todo', function(req, res) {
     let date = req.query.date
-    let tel = req.query.usr_tel
-    console.log("后台接受的数据为" + date + tel)
+    let usr_cookie = req.query.usr_cookie
+    console.log("后台接受的数据为" + date + usr_cookie)
+    var tel=searchIDBycookie(usr_cookie)
     todoModel.find({ date: date, usr_tel: tel }, (err, result) => {
         if (err) {
             console.log(err)
@@ -173,6 +157,6 @@ express.get('/get_todo', function(req, res) {
     }).sort({ "timef": 1 })
 })
 
-express.listen(8080, () => {
+express.listen(3000, () => {
     console.log("ToDo后台管理已上线")
 })

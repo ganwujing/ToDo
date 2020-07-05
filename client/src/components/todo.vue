@@ -83,6 +83,7 @@
   </div>
 </template>
 <script>
+const docCookie=document.cookie;
 import moment from "moment";
 export default {
   name: "todo",
@@ -157,7 +158,7 @@ export default {
         url: this.api + "/get_todo",
         params: {
           date: currdate,
-          usr_tel: this.tel
+          usr_cookie: docCookie,
         }
       })
         .then(res => {

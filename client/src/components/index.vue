@@ -89,7 +89,9 @@ export default {
             }).then((result)=>{
                 if(result.data=="501"){
                     //cookie验证成功，转到todo页面
-                    console.log(result)
+                    this.$router.push({
+                        name:"todo"
+                    })
                 }
                 if(result.data=="502"){
                     this.loginByTel();

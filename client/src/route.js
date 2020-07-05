@@ -13,7 +13,7 @@ export default new VueRouter({
             components: index
         },
         {
-            path: "/todo/:tel",
+            path: "/todo",
             name: "todo",
             component: todo,
             props: true,

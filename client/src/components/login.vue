@@ -70,9 +70,9 @@ export default {
                     this.$router.push(
                         {
                             name:'todo',
-                            params:{
-                                tel:this.telinput
-                            }
+                            // params:{
+                            //     tel:this.telinput
+                            // }
                         }
                     );
                 }
