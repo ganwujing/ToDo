@@ -1,5 +1,5 @@
 var mongoose = require('mongoose')
-var mongooseUrl = "mongodb://127.0.0.1:27017/ToDo_Db"
+var mongooseUrl = "mongodb://todomanager:726111@migo.group:27017/ToDo_Db"
 mongoose.connect(mongooseUrl, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
         if (err) {
             console.log("连接数据库失败")

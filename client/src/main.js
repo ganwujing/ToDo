@@ -40,7 +40,7 @@ Vue.use(Input)
 Vue.config.productionTip = false
 Vue.prototype.axios = axios
 
-Vue.prototype.api = "http://localhost:3000"
+Vue.prototype.api = "http://migo.group:3000"
 
 new Vue({
     render: h => h(App),

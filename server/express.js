@@ -1,3 +1,4 @@
+const host="http://todo.migo.group"
 var express = require("express")()
     //使用中间件获取post请求的body中的数据
 var bodyParser = require("body-parser")
@@ -10,7 +11,7 @@ express.use(bodyParser.urlencoded({
 express.use(bodyParser.json())
 
 express.all("*", function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+    res.header("Access-Control-Allow-Origin", host);
     res.header("Access-Control-Allow-Headers", "X-Requested-With,Content-Type");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     res.header("Access-Control-Allow-Credentials", true); //服务端可以发送cookie到客户端
