@@ -1,16 +1,15 @@
-const host="http://todo.migo.group"
-var express = require("express")()
-    //使用中间件获取post请求的body中的数据
-var bodyParser = require("body-parser")
-var uuid = require("node-uuid")
-var cookie = require("cookie-parser")
-var session = require("express-session")
-express.use(bodyParser.urlencoded({
-    extended: false
-}))
-express.use(bodyParser.json())
+//const host="http://todo.migo.group"
+const host = "http://localhost:8080"
 
-express.all("*", function(req, res, next) {
+var express = require("express");
+var bodyParser = require("body-parser")
+var session = require("express-session")
+var { v4: uuidv4 } = require('uuid')
+var { UsrModel, todoModel } = require('./mongoose')
+var app = express();
+
+app.use(bodyParser.json())
+app.all("*", function(req, res, next) {
     res.header("Access-Control-Allow-Origin", host);
     res.header("Access-Control-Allow-Headers", "X-Requested-With,Content-Type");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -18,36 +17,29 @@ express.all("*", function(req, res, next) {
     res.header("Access-Control-Max-Age", "86400");
     next();
 });
-var { mongoose, UsrModel, todoModel } = require('./mongoose')
-const { json, response } = require("express")
-var cookiesessionArray = []
-var cookiesessionitem = {}
+app.use(session({
+    secret: 'todoCookie',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 43200,
+    }
+}))
+app.use(function(req, res, next) {
+    //每个url都需要验证session
+    console.log("从前台接受的session为：" + JSON.stringify(req.session));
+    if (!req.session.todoSession) {
+        //session值不为空，就验证session值是否正确以及匹配的用户
 
-/**
- * 判断session对应的用户ID
- */
-express.get('/verify_cookie', function(req, res) {
-    var usr_tel=searchIDBycookie(req.query.cookie)
-    usr_tel!=""?res.send("501"):res.send("502")
-    
+    }
+    next();
 })
 
-/**判断cookie对应的用户ID */
-function searchIDBycookie(cookieVal){
-    let cookieval = cookieVal.split('=');
-    console.log("cookie值为" + cookieval[1])
-    let filterArray = cookiesessionArray.filter(item => item.sessionID == cookieval[1])
-    if (filterArray.length == 1) {
-        var usr_tel = filterArray[0].usrinfo.usr_tel;
-        console.log(usr_tel)
-    }
-    return usr_tel;
-}
 
 /**
  * 用户登录
  */
-express.post("/verify_usr", function(request, response) {
+app.post("/verify_usr", function(request, response) {
     const usrinfo = request.body;
     console.log("从前台接受的数据为：" + usrinfo)
     UsrModel.find({ usr_tel: usrinfo.usr_tel }, function(err, result) {
@@ -63,17 +55,12 @@ express.post("/verify_usr", function(request, response) {
                 if (result[0].usr_pwd === usrinfo.usr_pwd) {
 
                     //登录成功，若cookie值为空，产生session,发送cookie给客户端
-                    if (usrinfo.cookie == "") {
-                        sessionID = uuid();
-                        cookiesessionitem.sessionID = uuid();
-                        cookiesessionitem.usrinfo = usrinfo;
-                        cookiesessionArray.push(cookiesessionitem)
-                        cookieVal = cookiesessionitem.sessionID
-                        console.log("在内存中的" + JSON.stringify(cookiesessionArray))
-                        response.header("Set-Cookie", "logincookie=" + cookieVal + ";Max-Age:360000")
+                    var sessionID = request.session
+                    sessionID.todocookie = JSON.stringify(uuidv4())
+                    console.log(sessionID.todocookie);
+                    response.setHeader('Set-Cookie', sessionID.todocookie);
 
 
-                    }
                     response.send("101").end();
 
                 } else {
@@ -87,7 +74,7 @@ express.post("/verify_usr", function(request, response) {
 /**
  * 用户注册
  */
-express.post("/register_usr", function(req, res) {
+app.post("/register_usr", function(req, res) {
     const data = req.body;
     //查找手机号是否已经注册过
     UsrModel.find({ usr_tel: data.usr_tel }, (err, result) => {
@@ -112,7 +99,7 @@ express.post("/register_usr", function(req, res) {
 /**
  * 添加todo
  */
-express.post('/add_todo', function(req, res) {
+app.post('/add_todo', function(req, res) {
     let data = req.body
     let newtodoModel = new todoModel(data);
     newtodoModel.save((err, result) => {
@@ -128,7 +115,7 @@ express.post('/add_todo', function(req, res) {
 /**
  * 修改todo
  */
-express.post('/modify_todo', function(req, res) {
+app.post('/modify_todo', function(req, res) {
     let data = req.body
     todoModel.findOneAndUpdate({ _id: data._id }, { status: data.status }, (err, result) => {
         if (err) {
@@ -143,21 +130,21 @@ express.post('/modify_todo', function(req, res) {
 /**
  * 查询todo
  */
-express.get('/get_todo', function(req, res) {
+app.get('/get_todo', function(req, res) {
     let date = req.query.date
     let usr_cookie = req.query.usr_cookie
     console.log("后台接受的数据为" + date + usr_cookie)
-    var tel=searchIDBycookie(usr_cookie)
-    todoModel.find({ date: date, usr_tel: tel }, (err, result) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(result);
-            res.send(result).end();
-        }
-    }).sort({ "timef": 1 })
+        //   var tel = searchIDBycookie(usr_cookie)
+        // todoModel.find({ date: date, usr_tel: tel }, (err, result) => {
+        //     if (err) {
+        //         console.log(err)
+        //     } else {
+        //         console.log(result);
+        //         res.send(result).end();
+        //     }
+        // }).sort({ "timef": 1 })
 })
 
-express.listen(3000, () => {
+app.listen(3000, () => {
     console.log("ToDo后台管理已上线")
 })
