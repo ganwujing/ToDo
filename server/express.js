@@ -3,7 +3,6 @@ const host = "http://localhost:8080"
 
 var express = require("express");
 var bodyParser = require("body-parser")
-var session = require("express-session")
 var { v4: uuidv4 } = require('uuid')
 var { UsrModel, todoModel } = require('./mongoose')
 var app = express();
@@ -17,23 +16,6 @@ app.all("*", function(req, res, next) {
     res.header("Access-Control-Max-Age", "86400");
     next();
 });
-app.use(session({
-    secret: 'todoCookie',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 43200,
-    }
-}))
-app.use(function(req, res, next) {
-    //每个url都需要验证session
-    console.log("从前台接受的session为：" + JSON.stringify(req.session));
-    if (!req.session.todoSession) {
-        //session值不为空，就验证session值是否正确以及匹配的用户
-
-    }
-    next();
-})
 
 
 /**
