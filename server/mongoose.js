@@ -11,6 +11,7 @@ mongoose.connect(mongooseUrl, { useNewUrlParser: true, useUnifiedTopology: true 
 const usrSchema = mongoose.Schema({
         usr_tel: { type: String, require: true },
         usr_pwd: { type: String, require: true },
+        session_id:{type:String,require:true},
     })
     //定义Model
 const UsrModel = mongoose.model('usr_infos', usrSchema)

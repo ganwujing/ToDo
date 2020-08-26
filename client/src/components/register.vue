@@ -52,6 +52,7 @@ export default {
                     if(res.data=="202"){
                         this.msg="账号已注册"
                     }
+                  
                 }).catch((err)=>{
                     console.log(err)
                 })

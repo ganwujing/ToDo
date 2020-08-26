@@ -83,14 +83,13 @@
   </div>
 </template>
 <script>
-const docCookie=document.cookie;
 import moment from "moment";
 export default {
   name: "todo",
   props: {
-    tel: String
+    tel: String,
   },
-  data: function() {
+  data: function () {
     return {
       tododata: [],
       selectdate: moment().format("YYYY-MM-DD"),
@@ -101,139 +100,152 @@ export default {
       selecttimeF: moment().format("HH:mm"),
       selecttimeT: moment().format("HH:mm"),
       successalert: false,
+      docCookie: "",
       unfinishtodo: {
         "font-style": "",
         "text-decoration": "",
-        color: ""
+        color: "",
       },
       finishtodo: {
         "font-style": "italic",
         "text-decoration": "line-through",
-        color: "grey"
-      }
+        color: "grey",
+      },
     };
   },
-  created: function() {
+  created: function () {
     this.getdata();
   },
   computed: {
-    todopercent: function() {
-
-        return Math.round(
-            this.doStatusCount
-            /this.tododata.length
-            *100
-            )
-      /*let percent = 0;
-      if (this.tododata.length != 0) {
-        let count = 0;
-        let newpercent =(1 / this.tododata.length) * 100
-       
-          this.tododata.forEach(
-              item => {
-                if (item.status == "do") {
-                count = count + 1;
-                }
-            }
-          );
-
-
-
-        percent =Math.round (newpercent * count);
-      }
-      return percent;*/
+    todopercent: function () {
+      return Math.round((this.doStatusCount / this.tododata.length) * 100);
     },
-    doStatusCount:function(){
-        return this.tododata.filter(item=>item.status=='do').length
+    doStatusCount: function () {
+      return this.tododata.filter((item) => item.status == "do").length;
     },
-    undoStatusCount:function(){
-        return this.tododata.filter(item=>item.status=='undo').length
-    }
+    undoStatusCount: function () {
+      return this.tododata.filter((item) => item.status == "undo").length;
+    },
   },
   methods: {
-    getdata: function() {
-      let currdate = this.showdate;
-      this.axios({
-        method: "get",
-        url: this.api + "/get_todo",
-        params: {
-          date: currdate,
-          usr_cookie: docCookie,
-        }
-      })
-        .then(res => {
-          this.tododata = res.data;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-    Showdone: function(checked) {
+    Showdone: function (checked) {
       this.showtododone = !checked;
     },
     moment,
-    changedate: function(date) {
+    changedate: function (date) {
       this.selectdate = moment(date).format("YYYY-MM-DD");
     },
-    changeTimeF: function(time) {
+    changeTimeF: function (time) {
       this.selecttimeF = moment(time).format("HH:mm");
     },
-    changeTimeT: function(time) {
+    changeTimeT: function (time) {
       this.selecttimeT = moment(time).format("HH:mm");
     },
-    changeShowDT: function(date) {
+    changeShowDT: function (date) {
       this.showdate = moment(date).format("YYYY-MM-DD");
       this.getdata();
     },
-    modifyTodo: function(item) {
-      const data = {};
-
-      item.status == "undo" ? (data.status = "do") : (data.status = "undo");
-      console.log(item._id);
-      data._id = item._id;
-      console.log(data.status);
-      this.axios({
-        method: "post",
-        url: this.api + "/modify_todo",
-        data: data
-      })
-        .then(res => {
-          if (res.data == "401") {
-            this.getdata();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    cookieIsNull: function () {
+      this.docCookie = document.cookie;
+      if (this.docCookie == "") {
+        alert("登录已过期，请重新登录");
+        return false;
+      } else {
+        return true;
+      }
     },
-    addToDO: function() {
-      var data = {};
-      data.date = this.selectdate;
-      data.timef = this.selecttimeF;
-      data.timet = this.selecttimeT;
-      data.item = this.todoitem;
-      data.status = "undo";
-      data.usr_tel = this.tel;
-      this.axios({
-        method: "post",
-        url: this.api + "/add_todo",
-        data: data
-      })
-        .then(res => {
-          if (res.data == "301") {
-            this.successalert = true;
-            setTimeout(() => {
-              this.successalert = false;
-            }, 3000);
-            this.todoitem = "";
-          }
-          this.getdata();
+    getdata: function () {
+      let currdate = this.showdate;
+      if (this.cookieIsNull()) {
+        this.axios({
+          method: "get",
+          url: this.api + "/get_todo",
+          params: {
+            date: currdate,
+            cookie: this.docCookie,
+          },
         })
-        .catch(err => {
-          console.log(err);
-        });
-    }
-  }
+          .then((res) => {
+            if (res.data == "501") {
+              alert("请重新登录");
+            } else {
+              this.tododata = res.data;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+
+    modifyTodo: function (item) {
+      if (this.cookieIsNull()) {
+        const data = {};
+        item.status == "undo" ? (data.status = "do") : (data.status = "undo");
+        console.log(item._id);
+        data._id = item._id;
+        // data.cookie = this.docCookie;
+        console.log(data.status);
+        this.axios({
+          method: "post",
+          url: this.api + "/modify_todo",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+          data: data,
+          withCredentials: true,
+        })
+          .then((res) => {
+            if (res.data == "501") {
+              alert("请重新登录");
+            }
+            if (res.data == "401") {
+              this.getdata();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    addToDO: function () {
+      if (this.cookieIsNull()) {
+        var data = {};
+        data.date = this.selectdate;
+        data.timef = this.selecttimeF;
+        data.timet = this.selecttimeT;
+        data.item = this.todoitem;
+        data.status = "undo";
+        data.usr_tel = this.docCookie.split("&")[0].split("=")[1];
+
+        this.axios({
+          method: "post",
+          url: this.api + "/add_todo",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+          data: data,
+          withCredentials: true,
+        })
+          .then((res) => {
+            if (res.data == "501") {
+              alert("请重新登录");
+            }
+            if (res.data == "301") {
+              this.successalert = true;
+              setTimeout(() => {
+                this.successalert = false;
+              }, 3000);
+              this.todoitem = "";
+            }
+            this.getdata();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+  },
 };
 </script>
 <style>

@@ -8,7 +8,7 @@ var { UsrModel, todoModel } = require('./mongoose')
 var app = express();
 
 app.use(bodyParser.json())
-app.all("*", function(req, res, next) {
+app.all("*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", host);
     res.header("Access-Control-Allow-Headers", "X-Requested-With,Content-Type");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -17,62 +17,68 @@ app.all("*", function(req, res, next) {
     next();
 });
 
-
 /**
- * 用户登录
+ * 创建cookie
  */
-app.post("/verify_usr", function(request, response) {
-    const usrinfo = request.body;
-    console.log("从前台接受的数据为：" + usrinfo)
-    UsrModel.find({ usr_tel: usrinfo.usr_tel }, function(err, result) {
-        if (err) {
-            console.log(err)
-        } else {
-            if (result.length == 0) {
-                console.log("没有查询到手机号" + result)
-                response.send("103").end();
+function createCookie(usrinfo, uid, response) {
+    var sid = uuidv4();
+    console.log(sid);
+    return new Promise(function (resolve, reject) {
+        todoModel.findOneAndUpdate({ id: usrinfo._id }, { session_id: sid }, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject();
             } else {
-                console.log("查询到手机号为：" + result)
-                    //判断密码是否相同
-                if (result[0].usr_pwd === usrinfo.usr_pwd) {
-
-                    //登录成功，若cookie值为空，产生session,发送cookie给客户端
-                    var sessionID = request.session
-                    sessionID.todocookie = JSON.stringify(uuidv4())
-                    console.log(sessionID.todocookie);
-                    response.setHeader('Set-Cookie', sessionID.todocookie);
-
-
-                    response.send("101").end();
-
-                } else {
-                    response.send("102").end();
-                }
+                var cookie = "uid=" + uid + "&" + "sid=" + sid;
+                var exp = new Date();
+                exp.setTime(exp.getTime() + 60 * 1000*60*24);//过期时间 2分钟
+                var maxAge = ";expires=" + exp.toGMTString();
+                response.setHeader('Set-Cookie', cookie+maxAge);
+                resolve();
             }
-        }
+        })
     })
-})
+}
 
 /**
- * 用户注册
+ * 验证cookie
  */
-app.post("/register_usr", function(req, res) {
-    const data = req.body;
-    //查找手机号是否已经注册过
-    UsrModel.find({ usr_tel: data.usr_tel }, (err, result) => {
-        if (!err) {
-            if (result.length != 0) {
-                res.send("202").end()
-            } else {
-                const newUsrModel = new UsrModel(data)
-                newUsrModel.save((err, result) => {
-                    if (err) {
-                        console.log("注册账号失败")
-                    } else {
-                        res.send("201").end();
-                        console.log("注册成功:" + result)
-                    }
-                })
+app.all(['/refresh_page', '/enter_todo', '/add_todo', '/modify_todo', '/get_todo'], function (req, res, next) {
+    var url = req.baseUrl || req.originalUrl.split('?')[0];
+    console.log('!!!URL:'+url);
+    console.log(url);
+    var cookie = req.headers.cookie;
+
+    if (url == '/get_todo') {
+        cookie = req.query.cookie;
+    }
+
+    console.log("接收到的cookie" + cookie)
+    try {
+        var splitcookie = cookie.split('&');
+        var usr_id = splitcookie[0].split('=')[1];
+        var session_id = splitcookie[1].split('=')[1];
+    } catch (error) {
+        res.send();
+    }
+
+    UsrModel.find({ usr_tel: usr_id }, { session_id: session_id }, function (err, result) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        else if (result.length == 0) {
+            res.send("501")
+        }
+        else {
+            if (url == "/refresh_page" || url == '/enter_todo') {
+                result = new Object();
+                result.usr_id = usr_id;
+                result.code = "100"
+                res.send(result);
+            }
+            else{
+                next();
             }
         }
     })
@@ -81,7 +87,7 @@ app.post("/register_usr", function(req, res) {
 /**
  * 添加todo
  */
-app.post('/add_todo', function(req, res) {
+app.post('/add_todo', function (req, res) {
     let data = req.body
     let newtodoModel = new todoModel(data);
     newtodoModel.save((err, result) => {
@@ -97,7 +103,7 @@ app.post('/add_todo', function(req, res) {
 /**
  * 修改todo
  */
-app.post('/modify_todo', function(req, res) {
+app.post('/modify_todo', function (req, res) {
     let data = req.body
     todoModel.findOneAndUpdate({ _id: data._id }, { status: data.status }, (err, result) => {
         if (err) {
@@ -112,20 +118,80 @@ app.post('/modify_todo', function(req, res) {
 /**
  * 查询todo
  */
-app.get('/get_todo', function(req, res) {
+app.get('/get_todo', function (req, res) {
     let date = req.query.date
-    let usr_cookie = req.query.usr_cookie
-    console.log("后台接受的数据为" + date + usr_cookie)
-        //   var tel = searchIDBycookie(usr_cookie)
-        // todoModel.find({ date: date, usr_tel: tel }, (err, result) => {
-        //     if (err) {
-        //         console.log(err)
-        //     } else {
-        //         console.log(result);
-        //         res.send(result).end();
-        //     }
-        // }).sort({ "timef": 1 })
+    var cookie = req.query.cookie;
+    var splitcookie = cookie.split('&');
+    var usr_id = splitcookie[0].split('=')[1];
+    console.log('我要查'+date+'\t\t'+usr_id);
+    todoModel.find({ date: date, usr_tel: usr_id }, (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(result);
+            res.send(result).end();
+        }
+    }).sort({ "timef": 1 })
 })
+
+
+/**
+ * 用户登录
+ */
+app.post("/verify_usr", function (request, response) {
+    const usrinfo = request.body;
+    const uid = usrinfo.usr_tel;
+    UsrModel.find({ usr_tel: uid }, function (err, result) {
+        if (err) {
+            console.log(err)
+        } else {
+            if (result.length == 0) {
+                console.log("没有查询到手机号" + result)
+                response.send("103").end();
+            } else {
+                console.log("查询到手机号为：" + result)
+                //判断密码是否相同
+                if (result[0].usr_pwd === usrinfo.usr_pwd) {
+                    //登录成功，产生sid
+                    createCookie(usrinfo, uid, response)
+                        .then(() => {
+                            response.send("101").end();
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        })
+                } else {
+                    response.send("102").end();
+                }
+            }
+        }
+    })
+})
+
+/**
+ * 用户注册
+ */
+app.post("/register_usr", function (req, res) {
+    const data = req.body;
+    //查找手机号是否已经注册过
+    UsrModel.find({ usr_tel: data.usr_tel }, (err, result) => {
+        if (!err) {
+            if (result.length != 0) {
+                res.send("202").end()
+            } else {
+                const newUsrModel = new UsrModel(data)
+                newUsrModel.save((err, result) => {
+                    if (err) {
+                        console.log("注册账号失败")
+                    } else {
+                        res.send("201").end();
+                    }
+                })
+            }
+        }
+    })
+})
+
 
 app.listen(3000, () => {
     console.log("ToDo后台管理已上线")
