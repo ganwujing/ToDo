@@ -73,9 +73,13 @@
               :color="item.status == 'undo' ? 'blue' : 'green'"
               style="padding-bottom:40px"
             >
+           
               {{ item.timef }}~{{ item.timet }}
               <span>{{ item.item }}</span>
+               <a-icon type="edit"  :style="{fontSize:'20px'}"/>
+               <a-icon type="delete"  :style="{fontSize:'20px'}"/>
             </a-timeline-item>
+
           </a-timeline>
         </div>
       </div>
@@ -257,7 +261,7 @@ export default {
   width: 200px;
 }
 .todobg {
-  background-color: #ffecb3;
+  background-color: #fafafa;
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
@@ -287,10 +291,10 @@ export default {
 .todotable,
 .progress,
 .todoline {
-  background-color: #fafafa;
+  /* background-color: #fafafa; */
   margin-bottom: 20px;
   border-radius: 5px;
-  box-shadow: 2px 4px 8px 5px rgba(216, 164, 67, 0.5);
+  /* box-shadow: 2px 4px 8px 5px rgba(216, 164, 67, 0.5); */
 }
 
 .todoinput {

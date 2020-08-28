@@ -4,7 +4,8 @@ module.exports = {
     ],
     "plugins": [
         ["import",
-            { "libraryName": "ant-design-vue", "libraryDirectory": "es", "style": "true" }
+            { "libraryName": "ant-design-vue", "libraryDirectory": "es", "style": 'ant-design-vue/dist/antd.css' },
+            'ant-design-vue'
         ]
         // `style: true` 会加载 less 文件
     ]
