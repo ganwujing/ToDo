@@ -184,8 +184,8 @@ export default {
             if (res.data == "501") {
               alert("请重新登录");
             } else {
-             // this.tododata = res.data;
-             this.$set(this.data,'tododata',res.data);
+              this.tododata = res.data;
+             //this.$set(this.data,'tododata',res.data);
             }
           })
           .catch((err) => {
