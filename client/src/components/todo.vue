@@ -42,10 +42,11 @@
               :color="item.status == 'undo' ? 'blue' : 'green'"
               style="padding-bottom:40px"
             >
+               <a-icon type="edit"  :style="{fontSize:'18px',marginLeft:'5px'}" />
+              <a-icon type="delete" @click="deleteTodo(item)" :style="{fontSize:'18px',marginRight:'20px',marginLeft:'20px'}" />
               <span style="font-weight:bolder">{{ item.timef }}~{{ item.timet }}</span>
               <span style="margin-left:10px">{{ item.item }}</span>
-              <a-icon type="edit" v-if="true" :style="{fontSize:'18px',marginLeft:'20px'}" />
-              <a-icon type="delete" :style="{fontSize:'18px',marginLeft:'20px'}" />
+           
             </a-timeline-item>
           </a-timeline>
         </div>
@@ -78,9 +79,16 @@
           <div class="todo-progress-out" v-for="item in tododata" :key="item._id">
             <a-row style="marginBottom:10px">
               <a-col :span="8">
-                <a-slider :default-value="item.status=='do'?100:0" :min="0" :max="100" :step="10" />
+                <a-slider
+                  :default-value="item.status=='do'?100:0"
+                  :min="0"
+                  :max="100"
+                  :step="10"
+                  @afterChange="changeProcess(item)"
+                  @change="beforechangeProcess"
+                />
               </a-col>
-            
+
               <a-col :span="12">
                 <span style="fontSize:14px;margin-left:10%">{{ item.item }}</span>
               </a-col>
@@ -114,8 +122,9 @@ export default {
       selecttimeT: moment().format("HH:mm"),
       successalert: false,
       docCookie: "",
-      fullprocess:100,
-      zeroprocess:0,
+      fullprocess: 100,
+      processvalue: "",
+      zeroprocess: 0,
       unfinishtodo: {
         "font-style": "",
         "text-decoration": "",
@@ -169,6 +178,17 @@ export default {
         return true;
       }
     },
+    beforechangeProcess: function (value) {
+      this.processvalue = value;
+    },
+    changeProcess: function (item) {
+      var process = this.processvalue;
+      if (process == 100 || process == 0) {
+        process == 100 ? (item.status = "undo") : (item.status = "do");
+        process == 0 ? (item.status = "do") : (item.status = "undo");
+        this.modifyTodo(item);
+      }
+    },
     getdata: function () {
       let currdate = this.showdate;
       if (this.cookieIsNull()) {
@@ -184,8 +204,7 @@ export default {
             if (res.data == "501") {
               alert("请重新登录");
             } else {
-             // this.tododata = res.data;
-             this.$set(this.data,'tododata',res.data);
+              this.tododata = res.data;
             }
           })
           .catch((err) => {
@@ -193,7 +212,28 @@ export default {
           });
       }
     },
-
+    deleteTodo:function(item){
+        if(this.cookieIsNull()){
+            this.axios({
+              method:'post',
+              data:item,
+              url:this.api+'/delete_todo',
+              headers:{
+                "Content-Type": "application/json;charset=UTF-8",
+              },
+              withCredentials: true,
+            }).then((res)=>{
+              if (res.data == "501") {
+              alert("请重新登录");
+            }
+            if (res.data == "601") {
+              this.getdata();
+            }
+            }).catch((err)=>{
+              console.log(err);
+            })
+        }
+    },
     modifyTodo: function (item) {
       if (this.cookieIsNull()) {
         const data = {};

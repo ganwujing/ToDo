@@ -43,7 +43,7 @@ function createCookie(usrinfo, uid, response) {
 /**
  * 验证cookie
  */
-app.all(['/refresh_page', '/enter_todo', '/add_todo', '/modify_todo', '/get_todo'], function (req, res, next) {
+app.all(['/refresh_page', '/enter_todo', '/add_todo', '/modify_todo','delete_todo', '/get_todo'], function (req, res, next) {
     var url = req.baseUrl || req.originalUrl.split('?')[0];
     console.log('!!!URL:'+url);
     console.log(url);
@@ -111,6 +111,21 @@ app.post('/modify_todo', function (req, res) {
         } else {
             res.send("401").end();
             console.log("修改事项成功" + result)
+        }
+    })
+})
+
+/**
+ * 删除todo
+ */
+app.post('/delete_todo',function(req,res){
+    let data=req.body;
+    todoModel.findByIdAndDelete({_id:data._id},(err,result)=>{
+        if(err){
+            console.log('删除事项失败')
+        }
+        else{
+            res.send("601").end();
         }
     })
 })
