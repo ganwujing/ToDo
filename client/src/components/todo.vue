@@ -31,13 +31,32 @@
             ></a-input-search>
           </div>
         </div>
+        <hr style="background-color:#ececec;border:0;height:5px" />
+
+        <h1 class="todo-title">ToDo时间轴</h1>
+        <div class="todo-line">
+          <a-timeline>
+            <a-timeline-item
+              v-for="item in tododata"
+              :key="item._id"
+              :color="item.status == 'undo' ? 'blue' : 'green'"
+              style="padding-bottom:40px"
+            >
+              <span style="font-weight:bolder">{{ item.timef }}~{{ item.timet }}</span>
+              <span style="margin-left:10px">{{ item.item }}</span>
+              <a-icon type="edit" v-if="true" :style="{fontSize:'18px',marginLeft:'20px'}" />
+              <a-icon type="delete" :style="{fontSize:'18px',marginLeft:'20px'}" />
+            </a-timeline-item>
+          </a-timeline>
+        </div>
+      </div>
+      <div class="progress top-child">
         <h1 class="todo-title">ToDo待办事项</h1>
         <div style="position:relative;left:18vw;top:-35px">
           <a-switch @change="Showdone" checked-children="不显示Done" un-checked-children="显示Done" />
           <span style="margin-left:3vw">todo日期：</span>
           <a-date-picker :defaultValue="moment()" placeholder="ToDo日期" v-on:change="changeShowDT" />
         </div>
-
         <div class="todo-list">
           <div
             v-for="item in tododata"
@@ -53,34 +72,24 @@
             </a-checkbox>
           </div>
         </div>
-      </div>
-      <div class="progress top-child">
+        <hr style="background-color:#ececec;border:0;height:5px" />
         <h1 class="todo-title">ToDo完成进度</h1>
-        <div style="width: 50%" class="todo-progress" v-for="item in tododata" :key="item._id">
-          <span>{{ item.item }}</span>
-          <a-progress :percent="item.status == 'undo' ? 0 : 100" size="small" />
+        <div class="todo-processout">
+          <div class="todo-progress-out" v-for="item in tododata" :key="item._id">
+            <a-row style="marginBottom:10px">
+              <a-col :span="8">
+                <a-slider :default-value="item.status=='do'?100:0" :min="0" :max="100" :step="10" />
+              </a-col>
+            
+              <a-col :span="12">
+                <span style="fontSize:14px;margin-left:10%">{{ item.item }}</span>
+              </a-col>
+            </a-row>
+          </div>
         </div>
+
         <div class="todo-progress-circle">
           <a-progress type="circle" :percent="todopercent" />
-        </div>
-
-        <h1 class="todo-title">ToDo时间轴</h1>
-        <div class="todo-line">
-          <a-timeline>
-            <a-timeline-item
-              v-for="item in tododata"
-              :key="item._id"
-              :color="item.status == 'undo' ? 'blue' : 'green'"
-              style="padding-bottom:40px"
-            >
-           
-              {{ item.timef }}~{{ item.timet }}
-              <span>{{ item.item }}</span>
-               <a-icon type="edit"  :style="{fontSize:'20px'}"/>
-               <a-icon type="delete"  :style="{fontSize:'20px'}"/>
-            </a-timeline-item>
-
-          </a-timeline>
         </div>
       </div>
     </div>
@@ -105,6 +114,8 @@ export default {
       selecttimeT: moment().format("HH:mm"),
       successalert: false,
       docCookie: "",
+      fullprocess:100,
+      zeroprocess:0,
       unfinishtodo: {
         "font-style": "",
         "text-decoration": "",
@@ -173,7 +184,8 @@ export default {
             if (res.data == "501") {
               alert("请重新登录");
             } else {
-              this.tododata = res.data;
+             // this.tododata = res.data;
+             this.$set(this.data,'tododata',res.data);
             }
           })
           .catch((err) => {
@@ -261,7 +273,7 @@ export default {
   width: 200px;
 }
 .todobg {
-  background-color: #fafafa;
+  background-color: #ececec;
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
@@ -281,17 +293,19 @@ export default {
 
 .fillinfo,
 .todotable {
-  flex-basis: 50%;
+  flex-basis: 47.5%;
+  margin-left: 2%;
 }
 .progress,
 .todoline {
-  flex-basis: 48%;
+  flex-basis: 47.5%;
+  margin-right: 2%;
 }
 .fillinfo,
 .todotable,
 .progress,
 .todoline {
-  /* background-color: #fafafa; */
+  background-color: #ffffff;
   margin-bottom: 20px;
   border-radius: 5px;
   /* box-shadow: 2px 4px 8px 5px rgba(216, 164, 67, 0.5); */
@@ -317,14 +331,13 @@ export default {
 .todo-table,
 .todo-line {
   margin: 20px 0px;
-  margin-left: 5%;
+  margin-left: 6%;
 }
 .todo-list {
-  float: left;
   margin-left: 10%;
 }
 .todolist-item {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   font-size: 20px;
 }
 .todo-progress {
@@ -348,5 +361,16 @@ export default {
   letter-spacing: 2px;
   font-weight: bold;
   margin-left: 2%;
+}
+.todo-line {
+  margin-top: 30px;
+  margin-left: 10%;
+}
+.todo-list {
+  margin-top: -20px;
+}
+.todo-processout {
+  margin-top: 20px;
+  margin-left: 10%;
 }
 </style>

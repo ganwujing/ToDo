@@ -19,6 +19,10 @@ import {
     Alert,
     Checkbox,
     Switch,
+    Slider,
+    Row,
+    Col,
+    InputNumber,
 } from 'ant-design-vue'
 Vue.component(TimePicker.name, TimePicker)
 Vue.component(Button.name, Button)
@@ -33,6 +37,15 @@ Vue.component(Divider.name, Divider)
 Vue.component(Alert.name, Alert)
 Vue.component(Checkbox.name, Checkbox)
 Vue.component(Switch.name, Switch)
+Vue.component(Slider.name, Slider)
+Vue.component(Slider.name, Slider)
+Vue.component(Row.name, Row)
+Vue.component(Col.name, Col)
+Vue.component(InputNumber.name, InputNumber)
+
+
+
+
 
 Vue.use(Timeline)
 Vue.use(Input)

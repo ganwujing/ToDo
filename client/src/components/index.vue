@@ -19,9 +19,9 @@
           </ul>
           <button class="btn nav-btn" @click="enterTodo">进入ToDo</button>
         </nav>
-        <div class="header-login" @click="loginByTel">
-          <span v-show="!showUid">登录/注册</span>
-          <span v-show="showUid">Hello!{{usr_id}}</span>
+        <div class="header-login" >
+          <span v-if="!showUid" @click="loginByTel">登录/注册</span>
+          <span v-if="showUid">Hello!{{usr_id}}</span>
         </div>
       </header>
       <div class="main product-introduce">
