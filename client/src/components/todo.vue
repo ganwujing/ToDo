@@ -413,4 +413,10 @@ export default {
   margin-top: 20px;
   margin-left: 10%;
 }
+@media screen and (max-width: 600px){
+  .top{
+    display:block;
+  }
+
+}
 </style>

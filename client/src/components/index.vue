@@ -50,7 +50,7 @@
           </div>
           <div class="contanct-item">
             <p>QQ</p>
-            <img class="contact-img" src="../assets/qq.jpg" />
+            <img class="contact-img" src="../assets/weibo.jpg" />
           </div>
         </div>
       </div>
@@ -153,17 +153,21 @@ export default {
 #index {
   position: relative;
   width: 100%;
-  height: 100vh;
+  
   z-index: 100;
+  background-image: url('../assets/bg2.png');
 }
+
 
 .index-header {
   position: relative;
+  width: 80%;
 }
+
 
 header,
 header button {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: bolder;
   letter-spacing: 2px;
   height: 50px;
@@ -220,7 +224,7 @@ header button {
 .nav-btn {
   width: 120px;
   height: 35px;
-  font-size: 18px;
+  font-size: 1.8rem;
   position: absolute;
   right: 60px;
   top: 20px;
@@ -242,7 +246,7 @@ header button {
 
 .header-login span {
   line-height: 35px;
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
@@ -250,8 +254,8 @@ header button {
   width: 80vw;
   color: white;
   line-height: 40px;
-  letter-spacing: 2px;
-  font-size: 18px;
+  letter-spacing: 3px;
+  font-size: 2rem;
   text-shadow: 2px 2px 10px rgba(172, 112, 0, 0.5);
   padding: 30px;
 }
@@ -264,6 +268,9 @@ header button {
 
 .main-text:hover {
   text-shadow: 2px 2px 10px 12px rgba(172, 112, 0, 0.5);
+}
+.product-introduce{
+  margin-top: 10px;
 }
 
 .contanct {
@@ -290,12 +297,23 @@ header button {
 }
 
 .index-foot {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 10px;
-  font-size: 14px;
+  text-align: center;
+  padding-bottom: 10px;
+  font-size: 1.4rem;
   color: grey;
   letter-spacing: 1px;
+}
+
+@media screen and (max-width: 600px){
+   .index-header {
+  width: 100%;
+}
+.main{
+  width: 100vw;
+}
+.header-nav{
+  display: none;
+}
+
 }
 </style>
