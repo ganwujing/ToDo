@@ -26,9 +26,12 @@ export default {
   background-size: 100vw;
   background-repeat: repeat-y;
   height: 100vh;
+  position: relative;
 }
 .showindex{
   z-index: 100;
+  width: 100vw;
+  position: absolute;
   
 }
 .showtodo{
