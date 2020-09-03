@@ -14,12 +14,14 @@
             format="YYYY-MM-DD"
             v-on:change="changedate"
           ></a-date-picker>
-          <span class="todo-inputText">ToDo时间</span>
+          <span class="todo-inputText mobile">ToDo时间</span>
+          <div class="todoinput">
           <a-time-picker placeholder="开始时间" format="HH:mm" size="large" v-on:change="changeTimeF"></a-time-picker>
           <a-time-picker placeholder="结束时间" format="HH:mm" size="large" v-on:change="changeTimeT"></a-time-picker>
         </div>
+        </div>
         <div class="todo-input todo-inputitem">
-          <span class="todo-inputText">ToDo事项</span>
+          <span class="todo-inputText mobile">ToDo事项</span>
           <div class="todoinput">
             <a-input-search
               placeholder="input todo item"
@@ -322,6 +324,7 @@ export default {
   overflow-x: hidden;
   font-size: 16px;
   font-family: microsoft;
+  position: absolute;
 }
 .top {
   display: flex;
@@ -398,7 +401,7 @@ export default {
   src: url("../assets/microsoft.ttf");
 }
 .todo-title {
-  margin-top: 20px;
+  padding-top: 20px;
   font-size: 20px;
   font-family: microsoft;
   letter-spacing: 2px;
@@ -415,5 +418,25 @@ export default {
 .todo-processout {
   margin-top: 20px;
   margin-left: 10%;
+}
+@media screen and (max-width: 600px){
+  .top{
+    display:block;
+  }
+  .fillinfo, .todotable {
+    margin-left: 0;
+}
+.progress, .todoline {
+    margin-right: 0;
+}
+.mobile{
+  display: block;
+}
+.todoinput{
+  position: relative;
+  left: 5%;
+  top: -10px;
+}
+
 }
 </style>

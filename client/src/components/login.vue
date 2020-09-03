@@ -165,4 +165,11 @@ export default {
   color: rgb(253, 173, 1);
   text-decoration: none;
 }
+@media screen and (max-width: 600px) {
+  .tel-login{
+   width: 80vw;
+   left:10vw;
+   top:15vh;
+}
+}
 </style>>
