@@ -183,9 +183,12 @@ export default {
     },
     changeProcess: function (item) {
       var process = this.processvalue;
-      if (process == 100 || process == 0) {
-        process == 100 ? (item.status = "undo") : (item.status = "do");
-        process == 0 ? (item.status = "do") : (item.status = "undo");
+      if (process == 100 ) {
+        item.status="undo"
+        this.modifyTodo(item);
+      }
+      if(process==0){
+        item.status="do";
         this.modifyTodo(item);
       }
     },
