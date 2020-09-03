@@ -150,10 +150,11 @@ export default {
 * {
   margin: 0 auto;
 }
+
 #index {
   position: relative;
   width: 100%;
-  
+  height: 100vh;
   z-index: 100;
   background-image: url('../assets/bg2.png');
 }
@@ -303,17 +304,39 @@ header button {
   color: grey;
   letter-spacing: 1px;
 }
+.foot-div{
+  position: absolute;
+  bottom:0;
+  width: 80%;
+  left:10%;
+}
 
 @media screen and (max-width: 600px){
    .index-header {
   width: 100%;
 }
+.header-login{
+  right: 1%;
+}
+.nav-btn{
+  right: 26%;
+}
+.header-logo{
+  left:1%;
+}
 .main{
   width: 100vw;
 }
-.header-nav{
+.header-nav ul{
   display: none;
 }
+#index{
+  height: auto;
+}
+.foot-div{
+ position: static;
+}
+
 
 }
 </style>
