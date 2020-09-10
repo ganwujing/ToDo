@@ -15,7 +15,7 @@
             v-on:change="changedate"
           ></a-date-picker>
           <span class="todo-inputText mobile">ToDo时间</span>
-          <div class="todoinput">
+          <div class="todoinput1">
           <a-time-picker placeholder="开始时间" format="HH:mm" size="large" v-on:change="changeTimeF"></a-time-picker>
           <a-time-picker placeholder="结束时间" format="HH:mm" size="large" v-on:change="changeTimeT"></a-time-picker>
         </div>
@@ -55,7 +55,7 @@
       </div>
       <div class="progress top-child">
         <h1 class="todo-title">ToDo待办事项</h1>
-        <div style="position:relative;left:18vw;top:-35px">
+        <div class="selectdate" >
           <a-switch @change="Showdone" checked-children="不显示Done" un-checked-children="显示Done" />
           <span style="margin-left:3vw">todo日期：</span>
           <a-date-picker :defaultValue="moment()" placeholder="ToDo日期" v-on:change="changeShowDT" />
@@ -185,9 +185,12 @@ export default {
     },
     changeProcess: function (item) {
       var process = this.processvalue;
-      if (process == 100 || process == 0) {
-        process == 100 ? (item.status = "undo") : (item.status = "do");
-        process == 0 ? (item.status = "do") : (item.status = "undo");
+      if (process == 100 ) {
+        item.status="do"
+        this.modifyTodo(item);
+      }
+      if(process==0){
+        item.status="undo";
         this.modifyTodo(item);
       }
     },
@@ -353,12 +356,21 @@ export default {
   border-radius: 5px;
   /* box-shadow: 2px 4px 8px 5px rgba(216, 164, 67, 0.5); */
 }
-
+.selectdate{
+position:relative;
+left:18vw;
+top:-35px;
+}
 .todoinput {
   /* width: 70%; */
   position: relative;
   top: -30px;
-  right: -18%;
+  right: -16%;
+}
+.todoinput1{
+  position: relative;
+  top: -40px;
+    left: 55%;
 }
 
 .todo-inputText {
@@ -417,6 +429,9 @@ export default {
   margin-left: 10%;
 }
 @media screen and (max-width: 600px){
+  .todobg{
+    height: 100%;
+  }
   .top{
     display:block;
   }
@@ -433,6 +448,13 @@ export default {
   position: relative;
   left: 5%;
   top: -10px;
+}
+.selectdate{
+  position: static;
+    margin-bottom: 20px;
+}
+.todo-progress-circle{
+  display: none;
 }
 
 }
